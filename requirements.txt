@@ -1,0 +1,16 @@
+torch
+torchvision
+numpy==1.26.4
+pandas==1.5.2
+matplotlib
+torchmetrics
+tqdm
+imgaug
+rpy2==3.5.6
+openpyxl
+statsmodels
+scikit-learn
+deprecation
+kornia
+submitit
+# Optional for processing with Kalman filters: torchcast: -e git+https://github.com/strongio/torchcast.git#egg=torchcast

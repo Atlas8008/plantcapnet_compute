@@ -1,0 +1,5 @@
+from .classification import ClassificationConfiguration, get_configurations as get_classification_configurations
+from .segmentation import SegmentationConfiguration, get_configurations as get_segmentation_configurations
+from .cover_prediction import CoverPredictionConfiguration, get_configurations as get_cover_configurations
+
+from .configuration import Configuration, MetaConfiguration

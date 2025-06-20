@@ -1,0 +1,11 @@
+{
+    "exclude": [
+        "**/__pycache__/**",
+        "**/aggregated/**",
+        "**/datasets/**",
+        "**/meta/**",
+        "**/outputs/**",
+        "**/saved_models/**",
+        "**/segmentation_plots/**"
+    ]
+}
