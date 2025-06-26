@@ -62,7 +62,34 @@ def run_training(rank, world_size, mode, n_outputs_pretraining, n_outputs_target
         device,
     )
 
-    if config.args.dataset.lower() != "none":
+    if config.args.dataset.lower() == "none":
+        if not is_ensemble:
+            # Do a dry run and restore model parameters if needed
+            with torch.no_grad():
+                model.eval()
+                inp = torch.zeros((1, 3, 512, 512)).to(device)
+
+                model(
+                    inp,
+                    **config.model_kwargs,
+                )
+
+            if restore_checkpoint is not None:
+                if restore_checkpoint == "reset":
+                    model.apply(reset_params)
+                else:
+                    restore_config = get_restore_config(
+                        configurations=configurations,
+                        restore_checkpoint=restore_checkpoint,
+                        config_idx=config_idx
+                    )
+
+                    restore_config.restore_model_from_checkpoint(
+                        model
+                    )
+
+            config.set_model_trainability(model)
+    else: # Proceed with training
         training_loader = config.training_loader
         validation_loader = config.eval_loader
 
