@@ -206,6 +206,9 @@ for epochs in model_epochs:
 
             cmd += remaining_params + additional_params
 
+            if not args.slurm:
+                print(f"Launched job for {exp_name} with command: {cmd}")
+
             job = launch_job(
                 cmd,
                 exp_name,
@@ -227,8 +230,6 @@ for epochs in model_epochs:
 
             if args.slurm and job is not None:
                 print(f"Launched job {job.job_id} for {exp_name} with command: {cmd}")
-            else:
-                print(f"Launched job for {exp_name} with command: {cmd}")
 
         exp_names.append(exp_name)
 

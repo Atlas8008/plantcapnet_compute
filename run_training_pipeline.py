@@ -32,6 +32,19 @@ def get_restore_config(configurations, restore_checkpoint, config_idx):
     else:
         return configurations[restore_checkpoint]
 
+def create_link(config):
+    os.makedirs(
+        os.path.dirname(config.model_link_path),
+        exist_ok=True,
+    )
+    os.symlink(
+        os.path.relpath(
+            config.model_save_path,
+            os.path.dirname(config.model_link_path),
+        ),
+        config.model_link_path,
+    )
+
 def run_training(rank, world_size, mode, n_outputs_pretraining, n_outputs_target_task, restore_checkpoint, args, config, config_idx, configurations):
     is_distributed = args["main"].multigpu
 
@@ -182,22 +195,12 @@ def run_training(rank, world_size, mode, n_outputs_pretraining, n_outputs_target
             os.path.dirname(config.model_save_path),
             exist_ok=True,
         )
-        os.makedirs(
-            os.path.dirname(config.model_link_path),
-            exist_ok=True,
-        )
 
         print("Saving model to", config.model_save_path)
         torch.save(model, config.model_save_path)
 
-        if not os.path.exists(config.model_link_path) and config.keep_saved_model:
-            os.symlink(
-                os.path.relpath(
-                    config.model_save_path,
-                    os.path.dirname(config.model_link_path),
-                ),
-                config.model_link_path,
-            )
+    if not os.path.exists(config.model_link_path) and config.keep_saved_model:
+        create_link(config)
 
     config.save_hash_and_config()
 
@@ -368,6 +371,9 @@ if __name__ == "__main__":
                     )
                 else:
                     run_training(0, 1, mode, n_outputs_pretraining, n_outputs_target_task, restore_checkpoint, args, config, config_idx, configurations)
+
+            if os.path.exists(config.model_save_path) and not os.path.exists(config.model_link_path):
+                create_link(config)
 
             if run_eval or run_inference: # Evaluate and log metrics
                 print("Loading model from", config.model_save_path)
